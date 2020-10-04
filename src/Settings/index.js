@@ -1,12 +1,15 @@
 import React from 'react';
 import ConfirmButton from './ConfirmButton';
 import WelcomeMessage from './WelcomeMessage';
+import Page from '../Shared/Page';
+import CoinGrid from './CoinGrid';
 
 export default function () {
     return (
-        <div>
+        <Page name='Settings'>
             <WelcomeMessage />
             <ConfirmButton />
-        </div>
+            <CoinGrid />
+        </Page>
     )
 }
