@@ -24,14 +24,6 @@ export class AppProvider extends React.Component {
         this.setState({ coinList });
     };
 
-    setPage = (page) => this.setState({ page });
-
-    savedSettings() {
-        const cryptoDashData = JSON.parse(localStorage.getItem('cryptoDash'));
-        if (!cryptoDashData) return { page: 'Settings', firstVisit: true };
-        return {};
-    }
-
     confirmFavorites = () => {
         this.setState({
             firstVisit: false,
@@ -44,6 +36,16 @@ export class AppProvider extends React.Component {
             })
         );
     };
+
+    savedSettings() {
+        const cryptoDashData = JSON.parse(localStorage.getItem('cryptoDash'));
+        if (!cryptoDashData) {
+            return { page: 'Settings', firstVisit: true };
+        }
+        return {};
+    }
+
+    setPage = (page) => this.setState({ page });
 
     render() {
         return <AppContext.Provider value={this.state}>{this.props.children}</AppContext.Provider>;
