@@ -1,8 +1,9 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { fontSize3, fontSizeBig } from '../Shared/Styles';
+import { fontSize3, fontSizeBig, greenBoxShadow } from '../Shared/Styles';
 import { SelectableTile } from '../Shared/Tile';
 import { CoinHeaderGridStyled } from '../Settings/CoinHeaderGrid';
+import { AppContext } from '../App/AppProvider';
 
 const JustifyRight = styled.div`
     justify-self: right;
@@ -29,7 +30,7 @@ const numberFormat = (number) => {
     return +(number + '').slice(0, 7);
 };
 
-const PriceTyleStyled = styled(SelectableTile)`
+const PriceTileStyled = styled(SelectableTile)`
     ${(props) =>
         props.compact &&
         css`
@@ -38,6 +39,13 @@ const PriceTyleStyled = styled(SelectableTile)`
             grid-gap: 5px;
             grid-template-columns: repeat(3, 1fr);
             justify-items: right;
+        `}
+
+    ${(props) =>
+        props.currentFavorite &&
+        css`
+            ${greenBoxShadow};
+            pointer-events: none;
         `}
 `;
 
@@ -51,25 +59,25 @@ function ChangePercentage({ data }) {
     );
 }
 
-function PriceTile({ sym, data }) {
+function PriceTile({ sym, data, currentFavorite, setCurrentFavorite }) {
     return (
-        <PriceTyleStyled>
+        <PriceTileStyled onClick={setCurrentFavorite} currentFavorite={currentFavorite}>
             <CoinHeaderGridStyled>
                 <div>{sym}</div>
                 <ChangePercentage data={data} />
             </CoinHeaderGridStyled>
             <TickerPrice>${numberFormat(data.PRICE)}</TickerPrice>
-        </PriceTyleStyled>
+        </PriceTileStyled>
     );
 }
 
-function PriceTileCompact({ sym, data }) {
+function PriceTileCompact({ sym, data, currentFavorite, setCurrentFavorite }) {
     return (
-        <PriceTyleStyled compact>
+        <PriceTileStyled onClick={setCurrentFavorite} compact currentFavorite={currentFavorite}>
             <JustifyLeft>{sym}</JustifyLeft>
             <ChangePercentage data={data} />
             <div>${numberFormat(data.PRICE)}</div>
-        </PriceTyleStyled>
+        </PriceTileStyled>
     );
 }
 
@@ -78,8 +86,17 @@ export default function ({ price, index }) {
     let data = price[sym]['USD'];
     let TileClass = index < 5 ? PriceTile : PriceTileCompact;
     return (
-        <TileClass sym={sym} data={data}>
-            {sym} {data.PRICE}
-        </TileClass>
+        <AppContext.Consumer>
+            {({ currentFavorite, setCurrentFavorite }) => (
+                <TileClass
+                    sym={sym}
+                    data={data}
+                    currentFavorite={currentFavorite === sym}
+                    setCurrentFavorite={() => setCurrentFavorite(sym)}
+                >
+                    {sym} {data.PRICE}
+                </TileClass>
+            )}
+        </AppContext.Consumer>
     );
 }
