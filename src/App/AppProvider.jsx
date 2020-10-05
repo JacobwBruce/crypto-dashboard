@@ -19,6 +19,7 @@ export class AppProvider extends React.Component {
             removeCoin: this.removeCoin,
             isInFavorites: this.isInFavorites,
             confirmFavorites: this.confirmFavorites,
+            setFilteredCoins: this.setFilteredCoins,
         };
     }
 
@@ -37,6 +38,7 @@ export class AppProvider extends React.Component {
 
     componentDidMount = () => {
         this.fetchCoins();
+        this.fetchPrices();
     };
 
     fetchCoins = async () => {
@@ -44,13 +46,38 @@ export class AppProvider extends React.Component {
         this.setState({ coinList });
     };
 
+    fetchPrices = async () => {
+        if (this.state.firstVisit) return;
+        let prices = await this.prices();
+        prices = prices.filter((price) => Object.keys(price).length);
+        this.setState({ prices });
+    };
+
+    prices = async () => {
+        let returnData = [];
+        for (let fav of this.state.favorites) {
+            try {
+                let priceData = await cc.priceFull(fav, 'USD');
+                returnData.push(priceData);
+            } catch (err) {
+                console.error('Fetch price error: ', err);
+            }
+        }
+        return returnData;
+    };
+
     isInFavorites = (key) => _.includes(this.state.favorites, key);
 
     confirmFavorites = () => {
-        this.setState({
-            firstVisit: false,
-            page: 'Dashboard',
-        });
+        this.setState(
+            {
+                firstVisit: false,
+                page: 'Dashboard',
+            },
+            () => {
+                this.fetchPrices();
+            }
+        );
         localStorage.setItem(
             'cryptoDash',
             JSON.stringify({
@@ -69,6 +96,8 @@ export class AppProvider extends React.Component {
     }
 
     setPage = (page) => this.setState({ page });
+
+    setFilteredCoins = (filteredCoins) => this.setState({ filteredCoins });
 
     render() {
         return <AppContext.Provider value={this.state}>{this.props.children}</AppContext.Provider>;
