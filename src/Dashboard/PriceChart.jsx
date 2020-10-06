@@ -9,9 +9,13 @@ ReactHighcharts.Highcharts.setOptions(HighchartsTheme);
 export default function PriceChart() {
     return (
         <AppContext.Consumer>
-            {({}) => (
+            {({ historical }) => (
                 <Tile>
-                    <ReactHighcharts config={highchartsConfig()} />
+                    {historical ? (
+                        <ReactHighcharts config={highchartsConfig(historical)} />
+                    ) : (
+                        <div>Loading historical data</div>
+                    )}
                 </Tile>
             )}
         </AppContext.Consumer>
