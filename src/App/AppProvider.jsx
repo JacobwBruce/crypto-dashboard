@@ -16,6 +16,7 @@ export class AppProvider extends React.Component {
             page: 'Dashboard',
             favorites: ['BTC', 'ETH', 'XMR', 'DOGE'],
             timeInterval: 'months',
+            theme: this.getTheme(),
             ...this.savedSettings(),
             setPage: this.setPage,
             addCoin: this.addCoin,
@@ -25,8 +26,24 @@ export class AppProvider extends React.Component {
             setFilteredCoins: this.setFilteredCoins,
             setCurrentFavorite: this.setCurrentFavorite,
             changeChartSelect: this.changeChartSelect,
+            changeTheme: this.changeTheme,
         };
     }
+
+    getTheme = () => {
+        const theme = localStorage.getItem('theme');
+        if (!theme) {
+            localStorage.setItem('theme', 'dark');
+            return 'dark';
+        }
+        return theme;
+    };
+
+    changeTheme = () => {
+        const newTheme = this.state.theme === 'light' ? 'dark' : 'light';
+        localStorage.setItem('theme', newTheme);
+        window.location.reload();
+    };
 
     addCoin = (key) => {
         let favorites = [...this.state.favorites];
